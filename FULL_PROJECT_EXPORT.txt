@@ -1,0 +1,558 @@
+src/warehouse_interfaces/package.xml
+<?xml version="1.0"?>
+<package format="3">
+  <name>warehouse_interfaces</name>
+  <version>0.0.0</version>
+  <description>Custom interfaces for warehouse system</description>
+
+  <maintainer email="samiksha@todo.todo">samiksha</maintainer>
+  <license>MIT</license>
+
+  <buildtool_depend>ament_cmake</buildtool_depend>
+
+  <build_depend>rosidl_default_generators</build_depend>
+  <exec_depend>rosidl_default_runtime</exec_depend>
+
+  <member_of_group>rosidl_interface_packages</member_of_group>
+</package>
+src/warehouse_interfaces/CMakeLists.txt
+cmake_minimum_required(VERSION 3.8)
+project(warehouse_interfaces)
+
+find_package(ament_cmake REQUIRED)
+find_package(rosidl_default_generators REQUIRED)
+
+rosidl_generate_interfaces(${PROJECT_NAME}
+  "msg/RobotStatus.msg"
+  "msg/TaskCompleted.msg"
+  "srv/RegisterRobot.srv"
+  "srv/RequestTask.srv"
+)
+
+ament_export_dependencies(rosidl_default_runtime)
+
+ament_package()
+src/warehouse_robot/package.xml
+<?xml version="1.0"?>
+<?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
+<package format="3">
+  <name>warehouse_robot</name>
+  <version>0.0.0</version>
+  <description>TODO: Package description</description>
+  <maintainer email="samiksha@todo.todo">samiksha</maintainer>
+  <license>TODO: License declaration</license>
+
+  <depend>rclpy</depend>
+  <depend>std_msgs</depend>
+
+  <test_depend>ament_copyright</test_depend>
+  <test_depend>ament_flake8</test_depend>
+  <test_depend>ament_pep257</test_depend>
+  <test_depend>python3-pytest</test_depend>
+
+  <export>
+    <build_type>ament_python</build_type>
+  </export>
+</package>
+src/warehouse_robot/setup.py
+from setuptools import setup
+
+package_name = 'warehouse_robot'
+
+setup(
+    name=package_name,
+    version='0.0.0',
+    packages=[package_name],
+    data_files=[
+        ('share/ament_index/resource_index/packages',
+            ['resource/' + package_name]),
+        ('share/' + package_name, ['package.xml']),
+    ],
+    install_requires=['setuptools'],
+    zip_safe=True,
+    maintainer='samiksha',
+    maintainer_email='samiksha@todo.todo',
+    description='Warehouse Autonomous Mobile Robot Simulation',
+    license='MIT',
+    tests_require=['pytest'],
+    entry_points={
+        'console_scripts': [
+            'robot_core = warehouse_robot.robot_core:main',
+            'allocator_node = warehouse_robot.allocator_node:main',
+        ],
+    },
+)
+src/warehouse_robot/test/test_flake8.py
+# Copyright 2017 Open Source Robotics Foundation, Inc.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+from ament_flake8.main import main_with_errors
+import pytest
+
+
+@pytest.mark.flake8
+@pytest.mark.linter
+def test_flake8():
+    rc, errors = main_with_errors(argv=[])
+    assert rc == 0, \
+        'Found %d code style errors / warnings:\n' % len(errors) + \
+        '\n'.join(errors)
+src/warehouse_robot/test/test_copyright.py
+# Copyright 2015 Open Source Robotics Foundation, Inc.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+from ament_copyright.main import main
+import pytest
+
+
+# Remove the `skip` decorator once the source file(s) have a copyright header
+@pytest.mark.skip(reason='No copyright header has been placed in the generated source file.')
+@pytest.mark.copyright
+@pytest.mark.linter
+def test_copyright():
+    rc = main(argv=['.', 'test'])
+    assert rc == 0, 'Found errors'
+src/warehouse_robot/test/test_pep257.py
+# Copyright 2015 Open Source Robotics Foundation, Inc.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+from ament_pep257.main import main
+import pytest
+
+
+@pytest.mark.linter
+@pytest.mark.pep257
+def test_pep257():
+    rc = main(argv=['.', 'test'])
+    assert rc == 0, 'Found code style errors / warnings'
+src/warehouse_robot/warehouse_robot/warehouse_graph.py
+# warehouse_graph.py
+
+WAREHOUSE_GRAPH = {
+    "C1": (0, 0),
+    "A1": (2, 0),
+    "A2": (4, 0),
+    "A3": (6, 0),
+    "B1": (0, 3),
+    "B2": (2, 3),
+    "B3": (4, 3),
+    "DZ": (6, 3)   # Drop Zone
+}
+
+PATHS = {
+    "task_1": ["C1", "A1", "A2", "B2", "DZ"],
+    "task_2": ["C1", "B1", "B2", "B3", "DZ"],
+    "task_3": ["C1", "A1", "B2", "A3", "DZ"],
+    "task_4": ["C1", "A2", "A3", "B3", "DZ"]
+}
+src/warehouse_robot/warehouse_robot/__init__.py
+src/warehouse_robot/warehouse_robot/allocator_node.py
+import rclpy
+from rclpy.node import Node
+from std_msgs.msg import String
+import random
+import time
+
+
+class AllocatorNode(Node):
+
+    def __init__(self):
+        super().__init__('allocator_node')
+
+        # Robot registry
+        self.robots = {}
+
+        # Task tracking
+        self.task_counter = 0
+        self.active_tasks = {}
+        self.task_targets = {}
+
+        # Subscribers
+        self.create_subscription(String, 'robot_registration', self.register_robot, 10)
+        self.create_subscription(String, 'robot_heartbeat', self.heartbeat_callback, 10)
+        self.create_subscription(String, 'task_completion', self.task_completion_callback, 10)
+
+        # Timer for monitoring timeouts
+        self.create_timer(1.0, self.monitor_robots)
+
+        self.get_logger().info("Allocator Node Started")
+
+    # ---------------- REGISTER ROBOT ----------------
+    def register_robot(self, msg):
+        robot_id, x, y = msg.data.split(",")
+
+        self.robots[robot_id] = {
+            "x": int(x),
+            "y": int(y),
+            "last_heartbeat": time.time(),
+            "status": "IDLE",
+            "current_task": None
+        }
+
+        self.get_logger().info(f"{robot_id} registered")
+
+        self.assign_task(robot_id)
+
+    # ---------------- ASSIGN TASK ----------------
+    def assign_task(self, robot_id):
+
+        if robot_id not in self.robots:
+            return
+
+        self.task_counter += 1
+        task_id = f"T{self.task_counter}"
+
+        goal_x = random.randint(0, 29)
+        goal_y = random.randint(0, 29)
+
+        self.active_tasks[task_id] = robot_id
+        self.task_targets[task_id] = (goal_x, goal_y)
+
+        self.robots[robot_id]["current_task"] = task_id
+        self.robots[robot_id]["status"] = "ACTIVE"
+
+        pub = self.create_publisher(String, f'/{robot_id}/task', 10)
+
+        msg = String()
+        msg.data = f"{task_id},{self.robots[robot_id]['x']},{self.robots[robot_id]['y']},{goal_x},{goal_y}"
+
+        pub.publish(msg)
+
+        self.get_logger().info(f"Assigned {task_id} to {robot_id}")
+
+    # ---------------- HEARTBEAT ----------------
+    def heartbeat_callback(self, msg):
+
+        robot_id, x, y, status = msg.data.split(",")
+
+        if robot_id not in self.robots:
+            return
+
+        self.robots[robot_id]["x"] = int(x)
+        self.robots[robot_id]["y"] = int(y)
+        self.robots[robot_id]["last_heartbeat"] = time.time()
+        self.robots[robot_id]["status"] = status
+
+        # If robot crashed → reassign task
+        if status == "CRASHED":
+
+            self.get_logger().warning(f"{robot_id} reported CRASH")
+
+            failed_task = self.robots[robot_id]["current_task"]
+
+            if failed_task:
+                self.reassign_task(failed_task, robot_id)
+
+    # ---------------- TASK COMPLETE ----------------
+    def task_completion_callback(self, msg):
+
+        robot_id, task_id, result = msg.data.split(",")
+
+        if task_id in self.active_tasks:
+            del self.active_tasks[task_id]
+
+        if robot_id in self.robots:
+            self.robots[robot_id]["current_task"] = None
+            self.robots[robot_id]["status"] = "IDLE"
+
+        self.get_logger().info(f"{robot_id} completed {task_id}")
+
+        # Assign new task
+        self.assign_task(robot_id)
+
+    # ---------------- MONITOR ROBOTS ----------------
+    def monitor_robots(self):
+
+        current_time = time.time()
+
+        for robot_id, data in self.robots.items():
+
+            time_since_heartbeat = current_time - data["last_heartbeat"]
+
+            # Timeout detection (5 seconds)
+            if time_since_heartbeat > 5 and data["status"] == "ACTIVE":
+
+                self.get_logger().warning(f"{robot_id} TIMEOUT detected")
+
+                failed_task = data["current_task"]
+
+                if failed_task:
+                    self.reassign_task(failed_task, robot_id)
+
+    # ---------------- REASSIGN TASK ----------------
+    def reassign_task(self, task_id, failed_robot):
+
+        if task_id not in self.task_targets:
+            return
+
+        goal_x, goal_y = self.task_targets[task_id]
+
+        # Find idle robot
+        for robot_id, data in self.robots.items():
+
+            if robot_id != failed_robot and data["status"] == "IDLE":
+
+                pub = self.create_publisher(String, f'/{robot_id}/task', 10)
+
+                msg = String()
+                msg.data = f"{task_id},{data['x']},{data['y']},{goal_x},{goal_y}"
+
+                pub.publish(msg)
+
+                self.active_tasks[task_id] = robot_id
+                self.robots[robot_id]["current_task"] = task_id
+                self.robots[robot_id]["status"] = "ACTIVE"
+
+                self.get_logger().info(f"Reassigned {task_id} to {robot_id}")
+
+                return
+
+        self.get_logger().warning("No idle robot available for reassignment")
+
+
+def main(args=None):
+
+    rclpy.init(args=args)
+
+    node = AllocatorNode()
+
+    rclpy.spin(node)
+
+    node.destroy_node()
+
+    rclpy.shutdown()
+
+
+if __name__ == '__main__':
+    main()
+src/warehouse_robot/warehouse_robot/robot_core.py
+import rclpy
+from rclpy.node import Node
+from std_msgs.msg import String
+import random
+import time
+
+
+class WarehouseRobot(Node):
+
+    def __init__(self):
+        super().__init__('warehouse_robot')
+
+        # PARAMETERS
+        self.declare_parameter("robot_id", "robot_1")
+        self.declare_parameter("start_x", 0.0)
+        self.declare_parameter("start_y", 0.0)
+        self.declare_parameter("crash_mode", "none")
+        self.declare_parameter("crash_percentage", 50.0)
+        self.declare_parameter("failure_probability", 0.05)
+        self.declare_parameter("recovery_timeout", 5.0)
+        self.declare_parameter("step_interval", 0.5)
+
+        self.robot_id = self.get_parameter("robot_id").value
+        self.x = int(self.get_parameter("start_x").value)
+        self.y = int(self.get_parameter("start_y").value)
+        self.crash_mode = self.get_parameter("crash_mode").value
+        self.crash_percentage = float(self.get_parameter("crash_percentage").value)
+        self.failure_probability = float(self.get_parameter("failure_probability").value)
+        self.recovery_timeout = float(self.get_parameter("recovery_timeout").value)
+        self.step_interval = float(self.get_parameter("step_interval").value)
+
+        # STATE
+        self.current_path = []
+        self.current_step = 0
+        self.task_id = None
+        self.task_active = False
+        self.crashed = False
+        self.recovery_timer = None
+        self.deterministic_crash_triggered = False
+
+        # PUBLISHERS
+        self.registration_pub = self.create_publisher(String, 'robot_registration', 10)
+        self.heartbeat_pub = self.create_publisher(String, 'robot_heartbeat', 10)
+        self.completion_pub = self.create_publisher(String, 'task_completion', 10)
+
+        # TASK SUBSCRIPTION (INDIVIDUAL TOPIC)
+        self.task_sub = self.create_subscription(
+            String,
+            f'/{self.robot_id}/task',
+            self.task_callback,
+            10
+        )
+
+        # MAIN LOOP
+        self.timer = self.create_timer(self.step_interval, self.update_robot)
+
+        self.get_logger().info(
+            f"{self.robot_id} started at ({self.x}, {self.y}) CrashMode={self.crash_mode}"
+        )
+
+        self.register_robot()
+
+    # ---------------- REGISTER ----------------
+    def register_robot(self):
+        msg = String()
+        msg.data = f"{self.robot_id},{self.x},{self.y}"
+        self.registration_pub.publish(msg)
+
+    # ---------------- TASK RECEIVED ----------------
+    def task_callback(self, msg):
+        data = msg.data.split(",")
+        self.task_id = data[0]
+        goal_x = int(data[3])
+        goal_y = int(data[4])
+
+        self.current_path = self.generate_path(self.x, self.y, goal_x, goal_y)
+        self.current_step = 0
+        self.task_active = True
+        self.deterministic_crash_triggered = False
+
+        self.get_logger().info(
+            f"{self.robot_id} received Task {self.task_id}"
+        )
+
+    # ---------------- PATH GENERATION ----------------
+    def generate_path(self, sx, sy, gx, gy):
+        path = []
+        x, y = sx, sy
+
+        while x != gx:
+            x += 1 if gx > x else -1
+            path.append((x, y))
+
+        while y != gy:
+            y += 1 if gy > y else -1
+            path.append((x, y))
+
+        return path
+
+    # ---------------- HEARTBEAT ----------------
+    def send_heartbeat(self, status):
+        msg = String()
+        msg.data = f"{self.robot_id},{self.x},{self.y},{status}"
+        self.heartbeat_pub.publish(msg)
+
+    # ---------------- CRASH ----------------
+    def simulate_crash(self, reason):
+        if self.crashed:
+            return
+
+        self.crashed = True
+        self.task_active = False
+
+        self.get_logger().error(f"{self.robot_id} {reason}")
+        self.send_heartbeat("CRASHED")
+
+        if self.recovery_timer is None:
+            self.recovery_timer = self.create_timer(
+                self.recovery_timeout,
+                self.recover_from_crash
+            )
+
+    def recover_from_crash(self):
+        if not self.crashed:
+            return
+
+        self.get_logger().info(
+            f"{self.robot_id} RECOVERED after {self.recovery_timeout}s"
+        )
+
+        self.crashed = False
+        self.task_active = False  # wait for reassigned task
+
+        if self.recovery_timer:
+            self.recovery_timer.cancel()
+            self.recovery_timer = None
+
+    # ---------------- MAIN LOOP ----------------
+    def update_robot(self):
+
+        if self.crashed:
+            return
+
+        if not self.task_active:
+            self.send_heartbeat("IDLE")
+            return
+
+        if self.current_step >= len(self.current_path):
+            self.get_logger().info(f"{self.robot_id} completed Task {self.task_id}")
+
+            msg = String()
+            msg.data = f"{self.robot_id},{self.task_id},COMPLETED"
+            self.completion_pub.publish(msg)
+
+            self.task_active = False
+            self.send_heartbeat("IDLE")
+            return
+
+        # MOVE
+        self.x, self.y = self.current_path[self.current_step]
+        self.current_step += 1
+
+        self.get_logger().info(
+            f"{self.robot_id} moved to ({self.x}, {self.y})"
+        )
+
+        self.send_heartbeat("ACTIVE")
+
+        # -------- CRASH MODES --------
+
+        # Deterministic
+        if self.crash_mode == "deterministic" and not self.deterministic_crash_triggered:
+            progress = (self.current_step / len(self.current_path)) * 100.0
+            if progress >= self.crash_percentage:
+                self.deterministic_crash_triggered = True
+                self.simulate_crash(
+                    f"SIMULATED DETERMINISTIC CRASH at {progress:.2f}%"
+                )
+                return
+
+        # Random
+        if self.crash_mode == "random":
+            if random.random() < self.failure_probability:
+                self.simulate_crash("SIMULATED RANDOM CRASH")
+                return
+
+
+def main(args=None):
+    rclpy.init(args=args)
+    node = WarehouseRobot()
+    rclpy.spin(node)
+    node.destroy_node()
+    rclpy.shutdown()
+
+
+if __name__ == '__main__':
+    main()

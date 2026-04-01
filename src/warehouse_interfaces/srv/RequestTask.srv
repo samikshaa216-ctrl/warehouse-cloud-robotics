@@ -1,0 +1,12 @@
+string robot_id
+float32 x
+float32 y
+float32 battery
+---
+bool task_assigned
+int32 task_id
+float32 pickup_x
+float32 pickup_y
+float32 drop_x
+float32 drop_y
+float32 deadline
