@@ -1,0 +1,42 @@
+# Warehouse Cloud Robotics Configuration
+
+system:
+  num_robots: 6                    # Number of robots (1-10)
+  simulation_speed: 1.0            # Simulation speed multiplier
+  enable_visualization: true       # Enable RViz/Dashboard
+  enable_logging: true             # Enable CSV/JSON logging
+  log_level: INFO                  # DEBUG, INFO, WARNING, ERROR
+
+battery:
+  initial_level: 100.0             # Initial battery percentage
+  nominal_voltage: 48.0            # Volts
+  capacity_ah: 50.0                # Amp-hours
+  critical_threshold: 20.0         # Force charging below this %
+  low_threshold: 40.0              # Warning below this %
+  discharge_rate_idle: 0.5         # Amps when idle
+  discharge_rate_moving: 2.0       # Amps when moving
+  discharge_rate_carrying: 3.5     # Amps when carrying payload
+  charge_rate: 10.0                # Amps when charging
+
+checkpoint:
+  enabled: true
+  default_tier: edge               # local, edge, or cloud
+  compression: true                # Enable zlib compression
+  compression_level: 6             # 1 (fast) to 9 (best)
+  max_local_checkpoints: 10        # Max in-memory checkpoints
+
+scheduling:
+  algorithm: battery_aware_edf     # edf, battery_aware_edf, or fifo
+  task_timeout: 300.0              # Task timeout in seconds
+  battery_reserve: 15.0            # Min battery % to maintain
+  max_retries: 3                   # Max task retry attempts
+
+warehouse:
+  grid_width: 50                   # Grid width in meters
+  grid_height: 30                  # Grid height in meters
+  cell_size: 1.0                   # Each cell size in meters
+  charging_stations: 3             # Number of charging stations
+  charging_station_positions:
+    - [5, 5]
+    - [45, 5]
+    - [25, 25]
